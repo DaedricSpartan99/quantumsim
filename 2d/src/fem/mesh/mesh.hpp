@@ -29,7 +29,7 @@ namespace qsim2d {
 
       virtual triangle_t& get_triangle(index_t index) override;
       
-      const std::vector<vertex_t>& all_triangles() const;
+      const std::vector<triangle_t>& all_triangles() const;
 
       /*
        * Sizes

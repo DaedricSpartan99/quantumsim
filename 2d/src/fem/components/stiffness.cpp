@@ -5,7 +5,7 @@ using namespace qsim2d;
 cpx_matrix StiffnessComponent::generate_matrix() const {
   
   // initialize with a null matrix 
-  cpx_matrix A = cpx_matrix(N_vertex, point_t(N_vertex), 0);
+  cpx_matrix A = cpx_matrix(N_vertex, cpx_vector(N_vertex, 0));
 
   for (index_t k = 0; k < N_triangles; ++k) {
     
@@ -23,7 +23,7 @@ cpx_matrix StiffnessComponent::generate_matrix() const {
         double metric = contributions[k].abs_detB * (full_grad_i * full_grad_j);
 
         // integrate by interpolation
-        const std::complex integral = 0;
+        qsim2d::complex integral = 0;
       
         for (index_t l = 0; l < interp.size(); ++l) {
           integral += contributions[k].field_evals[l];

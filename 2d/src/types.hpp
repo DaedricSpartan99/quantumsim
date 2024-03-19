@@ -6,8 +6,10 @@
 #include <functional>
 
 namespace qsim2d {
-
-  typedef std::vector<std::complex> cpx_vector;
+  
+  // TODO use eigen  
+  typedef std::complex<double> complex;
+  typedef std::vector<complex> cpx_vector;
   typedef std::vector<cpx_vector> cpx_matrix;
   typedef std::array<double, 2> vertex_t;
   typedef std::array<vertex_t, 2> matrix_t;
@@ -41,11 +43,11 @@ namespace qsim2d {
    */
 
   // scalar product
-  std::complex operator*(const cpx_vector&, const cpx_vector&);
+  complex operator*(const cpx_vector&, const cpx_vector&);
   
   // scalar vector multiplication
-  cpx_vector operator*(const cpx_vector&, std::complex);
-  cpx_vector operator*(std::complex, const cpx_vector&);
+  cpx_vector operator*(const cpx_vector&, complex);
+  cpx_vector operator*(complex, const cpx_vector&);
   
   // sum of vectors
   cpx_vector operator+(const cpx_vector&, const cpx_vector&);
@@ -54,6 +56,6 @@ namespace qsim2d {
    * Operator overloading on complex matrix
    */
 
-  cpx_matrix operator*(const cpx_matrix&, const cpx_vector&);
+  cpx_vector operator*(const cpx_matrix&, const cpx_vector&);
 }
 

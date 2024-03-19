@@ -1,6 +1,8 @@
 #include "island_mesh.hpp"
 #include "mesh.hpp"
 
+using namespace qsim2d;
+
 IslandMesh::IslandMesh(const std::vector<vertex_t>& vertices, const std::vector<triangle_t>& triangles) :
   internal_mesh(nullptr),
   boundary_vertices(),  // init empty
@@ -31,12 +33,12 @@ IslandMesh::IslandMesh(const std::vector<vertex_t>& vertices, const std::vector<
     if (counts[i] <= 2) {
 
       // add boundary, already marked
-      boundary_vertices.push(vertices[i]);
+      boundary_vertices.push_back(vertices[i]);
 
     } else {
 
       // add to internal
-      internal_vertices.push(vertices[i]);
+      internal_vertices.push_back(vertices[i]);
 
       // mark as internal
       is_internal[i] = true;
@@ -61,21 +63,21 @@ IslandMesh::IslandMesh(const std::vector<vertex_t>& vertices, const std::vector<
   }
 
   // finally construct internal mesh
-  internal_mesh = std::make_unique<Mesh>(std::move(internal_vertices), std::move(boundary_vertices));
+  internal_mesh = std::make_unique<Mesh>(std::move(internal_vertices), std::move(internal_triangles));
 }
     
  /*
   *  Access to vertices
   */
 
-const vertex_t& IslandMesh::get_vertex(index_t index) {
+const vertex_t& IslandMesh::get_vertex(index_t index) const {
 
-  return (index < internal_mesh->n_vertices()) mesh.get_vertex(index) : boundary_vertices[index - internal_mesh->n_vertices()];
+  return (index < internal_mesh->n_vertices()) ? internal_mesh->get_vertex(index) : boundary_vertices[index - internal_mesh->n_vertices()];
 }
 
 vertex_t& IslandMesh::get_vertex(index_t index) {
 
-  return (index < internal_mesh->n_vertices()) mesh.get_vertex(index) : boundary_vertices[index - internal_mesh->n_vertices()];
+  return (index < internal_mesh->n_vertices()) ? internal_mesh->get_vertex(index) : boundary_vertices[index - internal_mesh->n_vertices()];
 }
 
  /*
@@ -84,12 +86,12 @@ vertex_t& IslandMesh::get_vertex(index_t index) {
 
 const triangle_t& IslandMesh::get_triangle(index_t index) const {
 
-  return (index < internal_mesh->n_triangles()) mesh.get_triangle(index) : boundary_triangles[index - internal_mesh->n_triangles()];
+  return (index < internal_mesh->n_triangles()) ? internal_mesh->get_triangle(index) : boundary_triangles[index - internal_mesh->n_triangles()];
 }
 
 triangle_t& IslandMesh::get_triangle(index_t index) {
 
-  return (index < internal_mesh->n_triangles()) mesh.get_triangle(index) : boundary_triangles[index - internal_mesh->n_triangles()];
+  return (index < internal_mesh->n_triangles()) ? internal_mesh->get_triangle(index) : boundary_triangles[index - internal_mesh->n_triangles()];
 }
 
  /*

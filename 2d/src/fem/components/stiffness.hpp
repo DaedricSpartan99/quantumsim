@@ -20,10 +20,11 @@ namespace qsim2d {
     private:
 
       // define gradients
-      static constexpr std::array<point_t, 3> gradients = {
-        {-1, -1}, 
-        { 1, 0},
-        { 0, 1}
+      static constexpr std::array<vertex_t, 3> gradients = {
+        vertex_t{-1, -1}, 
+        vertex_t{ 1, 0},
+        vertex_t{ 0, 1}
       };
+
   };
 }

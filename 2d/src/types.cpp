@@ -7,23 +7,23 @@ using namespace qsim2d;
  */
 
 // scalar product
-double operator*(const vertex_t& a, const vertex_t& b) {
+double qsim2d::operator*(const vertex_t& a, const vertex_t& b) {
 
   return a[0] * b[0] + a[1] * a[1];
 }
 
 // scalar vector multiplication
-vertex_t operator*(const vertex_t& v, double a) {
+vertex_t qsim2d::operator*(const vertex_t& v, double a) {
   
   return { v[0] * a, v[1] * a };
 }
 
-vertex_t operator*(double a, const vertex_t& v) {
+vertex_t qsim2d::operator*(double a, const vertex_t& v) {
   return v * a;
 }
 
 // sum of vectors
-vertex_t operator+(const vertex_t& v, const vertex_t& w) {
+vertex_t qsim2d::operator+(const vertex_t& v, const vertex_t& w) {
 
   return { v[0] + w[0], v[1] + w[1] };
 }
@@ -33,7 +33,7 @@ vertex_t operator+(const vertex_t& v, const vertex_t& w) {
  */
 
 // matrix vector multiplication
-vertex_t operator*(const matrix_t& A, const vertex_t& x) {
+vertex_t qsim2d::operator*(const matrix_t& A, const vertex_t& x) {
 
   vertex_t b;
 
@@ -42,7 +42,7 @@ vertex_t operator*(const matrix_t& A, const vertex_t& x) {
     b[i] = 0;
 
     for (int j = 0; j < 2; ++j) {
-      b[i] += A[i][j] * v[j];
+      b[i] += A[i][j] * x[j];
     }
   }
 
@@ -54,10 +54,10 @@ vertex_t operator*(const matrix_t& A, const vertex_t& x) {
  */
 
 // scalar product
-std::complex operator*(const cpx_vector& v, const cpx_vector& w) {
+complex qsim2d::operator*(const cpx_vector& v, const cpx_vector& w) {
 
-  std::complex result = 0;
-  const N = min(v.size(), w.size());
+  complex result = 0;
+  const size_t N = std::min(v.size(), w.size());
 
   for (std::size_t i = 0; i < N; ++i) {
     result += v[i] * w[i];
@@ -67,7 +67,7 @@ std::complex operator*(const cpx_vector& v, const cpx_vector& w) {
 }
 
 // scalar vector multiplication
-cpx_vector operator*(const cpx_vector& v, std::complex a) {
+cpx_vector qsim2d::operator*(const cpx_vector& v, complex a) {
 
   cpx_vector result(v);
 
@@ -78,12 +78,12 @@ cpx_vector operator*(const cpx_vector& v, std::complex a) {
   return result;
 }
 
-cpx_vector operator*(std::complex a, const cpx_vector& v) {
+cpx_vector qsim2d::operator*(complex a, const cpx_vector& v) {
   return v * a;
 }
 
 // sum of vectors
-cpx_vector operator+(const cpx_vector& v, const cpx_vector& w) {
+cpx_vector qsim2d::operator+(const cpx_vector& v, const cpx_vector& w) {
 
   cpx_vector result(v);
 
@@ -98,9 +98,9 @@ cpx_vector operator+(const cpx_vector& v, const cpx_vector& w) {
  * Operator overloading on complex matrix
  */
 
-cpx_matrix operator*(const cpx_matrix& A, const cpx_vector& v) {
+cpx_vector qsim2d::operator*(const cpx_matrix& A, const cpx_vector& v) {
 
-  cpx_matrix b(A.size(), 0);
+  cpx_vector b(A.size(), 0);
 
   for (int i = 0; i < A.size(); ++i) {
 

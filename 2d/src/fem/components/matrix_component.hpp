@@ -5,7 +5,8 @@
 
 namespace qsim2d {
 
-  
+  class Mesh;
+  class ScalarField;
 
   /*
    * Class grouping all information needed to solve stiffness parameter
@@ -14,9 +15,6 @@ namespace qsim2d {
   
   class MatrixComponent {
 
-    class Mesh;
-    class ScalarField;
-    
     public:
       MatrixComponent(const ScalarField&, const Mesh&, const std::vector<GaussPair>& gauss = GAUSS_TRI_POINTS);
 
@@ -31,7 +29,7 @@ namespace qsim2d {
 
     protected:
       
-      struct triangle_contrib {
+      struct triangle_contribution {
             
         // transform from local space to global
         // T_k(z) = a + B_k * z
@@ -53,14 +51,15 @@ namespace qsim2d {
 
       
       // triangles size
-      const std::size_t N_triangles;
+      std::size_t N_triangles;
 
       // number of vertices
-      const index_t N_vertex;
+      index_t N_vertex;
 
       // store local contribution
       std::vector<triangle_contribution> contributions;
       
       // Local interpolation points
       std::vector<GaussPair> interp;
+  };
 }

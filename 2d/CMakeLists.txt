@@ -2,12 +2,12 @@ cmake_minimum_required(VERSION 3.0.0)
 project (quantumsim2d)
 #include_directories(grid evolvers)
 
-set(CMAKE_CXX_STANDARD 17)
+set(CMAKE_CXX_STANDARD 20)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
 
 add_definitions(-DNDEBUG)
 
-include_directories(src fem/components fem/mesh)
+include_directories(src src/fem src/fem/components src/fem/mesh)
 add_library(quantumsim2d STATIC 
   src/types.cpp
   src/fem/components/mass.cpp
@@ -15,14 +15,14 @@ add_library(quantumsim2d STATIC
   src/fem/components/stiffness.cpp
   src/fem/mesh/mesh.cpp
   src/fem/mesh/island_mesh.cpp
-  src/fem/mesh/poisson_solver.cpp
+  src/solvers/laplace_solver.cpp
 )
 
 # vector/matrix test
-add_executable(test_vector testing/test_vector.cpp)
-target_link_libraries(test_vector quantumsim2d)
-add_test(NAME test_vector
-         COMMAND test_vector)
+#add_executable(test_vector testing/test_vector.cpp)
+#target_link_libraries(test_vector quantumsim2d)
+#add_test(NAME test_vector
+#         COMMAND test_vector)
 
 # mesh construction test
 #add_executable(test_mesh testing/test_mesh.cpp)

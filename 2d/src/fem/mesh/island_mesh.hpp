@@ -1,5 +1,6 @@
 #pragma once
 
+#include <memory>
 #include "abstract_mesh.hpp"
 
 namespace qsim2d {
@@ -25,7 +26,7 @@ namespace qsim2d {
        *  Careful: can be unefficient due to cache misses if jumping from internal to external vertices
        */
 
-      virtual const vertex_t& get_vertex(index_t index) override;
+      virtual const vertex_t& get_vertex(index_t index) const override;
 
       virtual vertex_t& get_vertex(index_t index) override;
 

@@ -41,7 +41,7 @@ triangle_t& Mesh::get_triangle(index_t index) {
   return triangles[index];
 }
 
-const std::vector<vertex_t>& Mesh::all_triangles() const {
+const std::vector<triangle_t>& Mesh::all_triangles() const {
   return triangles;
 }
 
@@ -50,11 +50,11 @@ const std::vector<vertex_t>& Mesh::all_triangles() const {
  */
 
 index_t Mesh::n_vertices() const {
-  return vertices.size()
+  return vertices.size();
 }
 
 index_t Mesh::n_triangles() const {
-  return triangles.size()
+  return triangles.size();
 }
 
 

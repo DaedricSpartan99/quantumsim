@@ -21,10 +21,6 @@ namespace qsim2d {
     private:
 
       // Define basis functions
-      static constexpr std::array<std::function<double(const vertex_t&)>, 3> basis = {
-        [](const vertex_t& z) -> double { return 1 - z[0] - z[1]; }, 
-        [](const vertex_t& z) -> double { return z[0]; },
-        [](const vertex_t& z) -> double { return z[1]; }
-      };
+      static std::array<std::function<double(const vertex_t&)>, 3> basis;
   };
 }
