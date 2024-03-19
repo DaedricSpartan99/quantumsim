@@ -35,6 +35,6 @@ namespace qsim2d {
       std::weak_ptr<IslandMesh> mesh;
 
       // lapack specific find matric kernel
-      static std::vector<cpx_vector> find_kernel(const cpx_matrix&);
+      static cpx_matrix find_kernel(const cpx_matrix&);
   };
 } 

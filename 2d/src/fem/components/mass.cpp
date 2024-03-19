@@ -11,7 +11,7 @@ std::array<std::function<double(const vertex_t&)>, 3> MassComponent::basis = {
 cpx_matrix MassComponent::generate_matrix() const {
   
   // initialize with a null matrix 
-  cpx_matrix M = cpx_matrix(N_vertex, cpx_vector(N_vertex, 0));
+  cpx_matrix M = cpx_matrix::Zero(N_vertex, N_vertex);
 
   for (index_t k = 0; k < N_triangles; ++k) {
     
@@ -39,7 +39,7 @@ cpx_matrix MassComponent::generate_matrix() const {
         }
 
         // update matrix
-        M[N_i][N_j] += metric * integral;
+        M(N_i, N_j) += metric * integral;
       }
     }
   } 

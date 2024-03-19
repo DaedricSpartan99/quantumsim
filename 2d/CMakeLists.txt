@@ -9,7 +9,6 @@ add_definitions(-DNDEBUG)
 
 include_directories(src src/fem src/fem/components src/fem/mesh)
 add_library(quantumsim2d STATIC 
-  src/types.cpp
   src/fem/components/mass.cpp
   src/fem/components/matrix_component.cpp
   src/fem/components/stiffness.cpp
@@ -18,17 +17,11 @@ add_library(quantumsim2d STATIC
   src/solvers/laplace_solver.cpp
 )
 
-# vector/matrix test
-#add_executable(test_vector testing/test_vector.cpp)
-#target_link_libraries(test_vector quantumsim2d)
-#add_test(NAME test_vector
-#         COMMAND test_vector)
-
 # mesh construction test
-#add_executable(test_mesh testing/test_mesh.cpp)
-#target_link_libraries(test_mesh quantumsim2d)
-#add_test(NAME test_mesh
-#         COMMAND test_mesh)
+add_executable(test_mesh testing/test_mesh.cpp)
+target_link_libraries(test_mesh quantumsim2d)
+add_test(NAME test_mesh
+         COMMAND test_mesh)
 
 # stiffness matrix construction test
 #add_executable(test_stiffness testing/test_stiffness.cpp)

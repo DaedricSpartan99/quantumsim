@@ -2,10 +2,16 @@
 
 using namespace qsim2d;
 
+const Eigen::Matrix<double, 2, 3> StiffnessComponent::gradients
+{
+  {-1, 1, 0},
+  {-1, 0, 1}
+};
+
 cpx_matrix StiffnessComponent::generate_matrix() const {
   
   // initialize with a null matrix 
-  cpx_matrix A = cpx_matrix(N_vertex, cpx_vector(N_vertex, 0));
+  cpx_matrix A = cpx_matrix::Zero(N_vertex, N_vertex);
 
   for (index_t k = 0; k < N_triangles; ++k) {
     
@@ -18,9 +24,9 @@ cpx_matrix StiffnessComponent::generate_matrix() const {
 
         // compute metrics
         // < B_k^(-T) * grad(phi_i) , B_k^(-T) * grad(phi_j) > * det(B_k)
-        vertex_t full_grad_i = contributions[k].invBT * gradients[i];
-        vertex_t full_grad_j = contributions[k].invBT * gradients[j];
-        double metric = contributions[k].abs_detB * (full_grad_i * full_grad_j);
+        vertex_t full_grad_i = contributions[k].invBT * gradients.col(i);
+        vertex_t full_grad_j = contributions[k].invBT * gradients.col(j);
+        double metric = contributions[k].abs_detB * full_grad_i.dot(full_grad_j);
 
         // integrate by interpolation
         qsim2d::complex integral = 0;
@@ -30,7 +36,7 @@ cpx_matrix StiffnessComponent::generate_matrix() const {
         }
 
         // update matrix
-        A[N_i][N_j] += metric * integral;
+        A(N_i, N_j) += metric * integral;
       }
     }
   } 
