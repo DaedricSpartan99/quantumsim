@@ -10,11 +10,13 @@ add_definitions(-DNDEBUG)
 include_directories(src src/fem src/fem/components src/fem/mesh)
 add_library(quantumsim2d STATIC 
   src/fem/components/mass.cpp
+  src/fem/components/load.cpp
   src/fem/components/matrix_component.cpp
   src/fem/components/stiffness.cpp
   src/fem/mesh/mesh.cpp
   src/fem/mesh/island_mesh.cpp
   src/solvers/laplace_solver.cpp
+  src/solvers/poisson_solver.cpp
 )
 
 # mesh construction test
@@ -22,6 +24,13 @@ add_executable(test_mesh testing/test_mesh.cpp)
 target_link_libraries(test_mesh quantumsim2d)
 add_test(NAME test_mesh
          COMMAND test_mesh)
+
+# poisson dirichlet zero solver test
+add_executable(test_poisson testing/test_poisson.cpp)
+target_link_libraries(test_poisson quantumsim2d)
+add_test(NAME test_poisson
+         COMMAND test_poisson)
+
 
 # stiffness matrix construction test
 #add_executable(test_stiffness testing/test_stiffness.cpp)
@@ -46,12 +55,6 @@ add_test(NAME test_mesh
 #target_link_libraries(test_laplace quantumsim2d)
 #add_test(NAME test_laplace
 #         COMMAND test_laplace)
-
-# poisson dirichlet zero solver test
-#add_executable(test_poisson testing/test_poisson.cpp)
-#target_link_libraries(test_poisson quantumsim2d)
-#add_test(NAME test_poisson
-#         COMMAND test_poisson)
 
 # heat dirichlet zero solver test
 #add_executable(test_heat testing/test_heat.cpp)

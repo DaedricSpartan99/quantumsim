@@ -4,6 +4,17 @@
 #include <iostream>
 #include <vector>
 #include <matplot/matplot.h>
+#include <functional>
+
+template<class T>
+T exact(T x, T y) {
+  return (1. - (x - 0.5)*(x - 0.5) / 4.) * (1. - (y - 0.5)*(y - 0.5) / 4.);
+}
+
+template<class T>
+T rhs(T x, T y) {
+  return -8. * (2. - 4. * ((x - 0.5) * (x - 0.5) + (y - 0.5)*(y - 0.5)) );
+}
 
 using namespace qsim2d;
 
@@ -14,7 +25,7 @@ int main() {
    */
   
   // square division per side
-  const int N = 5;
+  const int N = 20;
 
   // initialize components
   std::vector<vertex_t> vertices;
@@ -53,15 +64,10 @@ int main() {
 
   using namespace matplot;
 
-  // construct simple mesh 
-  Mesh simple_mesh(vertices, triangles);
-
-  // display simple mesh
-
-  
   // construct island mesh
   IslandMesh island_mesh(vertices, triangles);
 
-  // display island mesh
+  // Build poisson solver
 }
+
 
