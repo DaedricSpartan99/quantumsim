@@ -5,6 +5,7 @@
 #include <vector>
 #include <matplot/matplot.h>
 #include <functional>
+#include "solvers/poisson_solver.hpp"
 
 template<class T>
 T exact(T x, T y) {
@@ -65,9 +66,18 @@ int main() {
   using namespace matplot;
 
   // construct island mesh
-  IslandMesh island_mesh(vertices, triangles);
+  std::shared_ptr<IslandMesh> island_mesh = std::make_shared<IslandMesh>(vertices, triangles);
+
+  // construct field
+  ScalarField rhs_field([&](vertex_t v) -> complex {
+        return (complex) rhs(v[0], v[1]);
+      });
 
   // Build poisson solver
+  PoissonSolver solver(island_mesh, unit_function, rhs_field);
+  
+  // solve system
+  cpx_vector solution = solver.solve();
 }
 
 

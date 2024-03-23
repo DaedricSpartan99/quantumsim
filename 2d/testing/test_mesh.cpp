@@ -4,8 +4,13 @@
 #include <iostream>
 #include <vector>
 #include <matplot/matplot.h>
+#include <fstream>
+#include <string>
 
 using namespace qsim2d;
+
+void output_mesh(const Mesh&, const std::string&);
+
 
 int main() {
   
@@ -56,12 +61,36 @@ int main() {
   // construct simple mesh 
   Mesh simple_mesh(vertices, triangles);
 
-  // display simple mesh
-
+  // output simple mesh
+  output_mesh(simple_mesh, "simple");
   
   // construct island mesh
   IslandMesh island_mesh(vertices, triangles);
 
-  // display island mesh
+  // output other mesh
+  output_mesh(island_mesh.get_internal_mesh(), "internal");
 }
+
+
+void output_mesh(const Mesh& mesh, const std::string& file_prefix) {
+
+  std::ofstream vert_stream(file_prefix + "_vertex.dat");
+
+  for (const vertex_t& node : mesh.all_vertices()) {
+    vert_stream << node[0] << " " << node[1] << std::endl;
+  }
+
+  vert_stream.close();
+
+  std::ofstream triang_stream(file_prefix + "_triangles.dat");
+
+  for (const triangle_t& triangle : mesh.all_triangles()) {
+    triang_stream << triangle[0] << " " 
+                << triangle[1] << " "
+                << triangle[2] << std::endl;
+  }
+
+  triang_stream.close();
+}
+
 

@@ -1,6 +1,5 @@
 #include "matrix_component.hpp"
 #include "mesh.hpp"
-#include "scalar_field.hpp"
 
 using namespace qsim2d;
 

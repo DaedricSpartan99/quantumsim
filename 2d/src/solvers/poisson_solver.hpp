@@ -8,8 +8,6 @@
 
 namespace qsim2d {
 
-  class ScalarField;
-
   /*
    * This class solves problems in the form:
    *

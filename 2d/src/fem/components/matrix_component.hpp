@@ -6,7 +6,6 @@
 namespace qsim2d {
 
   class Mesh;
-  class ScalarField;
 
   /*
    * Class grouping all information needed to solve stiffness parameter

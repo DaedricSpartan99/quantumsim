@@ -9,6 +9,7 @@ add_definitions(-DNDEBUG)
 
 include_directories(src src/fem src/fem/components src/fem/mesh)
 add_library(quantumsim2d STATIC 
+  src/constants.cpp
   src/fem/components/mass.cpp
   src/fem/components/load.cpp
   src/fem/components/matrix_component.cpp
@@ -18,6 +19,9 @@ add_library(quantumsim2d STATIC
   src/solvers/laplace_solver.cpp
   src/solvers/poisson_solver.cpp
 )
+
+# copy mesh tester into build directory
+configure_file(${CMAKE_SOURCE_DIR}/testing/plot_mesh.py ${CMAKE_CURRENT_BINARY_DIR}/plot_mesh.py COPYONLY)
 
 # mesh construction test
 add_executable(test_mesh testing/test_mesh.cpp)
