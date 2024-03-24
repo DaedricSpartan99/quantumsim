@@ -10,10 +10,7 @@ def showMeshPlot(nodes, elements, prefix):
 
     triang = tri.Triangulation(y, z, triangles)
     
-    # plot nodes
-    #plt.plot(y,z, marker="o", ls="", color="crimson")
-
-    plt.triplot(triang, 'go-', lw=1.0, label=prefix)
+    plt.triplot(triang, 'o-', lw=1.0, label=prefix)
 
 
 def getNodesAndTriangles(prefix):
@@ -35,7 +32,7 @@ if len(sys.argv) < 2:
 prefixes = sys.argv[1:]
 
 plt.figure()
-plt.gca().set_aspect('equal')
+#plt.gca().set_aspect('equal')
 
 plt.title('This is the plot for meshes')
 plt.xlabel('X Axis')

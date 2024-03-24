@@ -5,7 +5,7 @@ project (quantumsim2d)
 set(CMAKE_CXX_STANDARD 20)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
 
-add_definitions(-DNDEBUG)
+#add_definitions(-DNDEBUG)
 
 include_directories(src src/fem src/fem/components src/fem/mesh)
 add_library(quantumsim2d STATIC 
