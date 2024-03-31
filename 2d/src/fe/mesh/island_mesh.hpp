@@ -54,6 +54,7 @@ namespace qsim2d {
        */
 
       index_t n_vertices() const override;
+      index_t n_active_vertices() const override;
       index_t n_triangles() const override;
 
     private:

@@ -7,17 +7,17 @@ set(CMAKE_CXX_STANDARD_REQUIRED ON)
 
 #add_definitions(-DNDEBUG)
 
-include_directories(src src/fem src/fem/components src/fem/mesh)
+include_directories(src src/fe src/fe/components src/fe/mesh src/integration src/solvers)
 add_library(quantumsim2d STATIC 
-  src/constants.cpp
-  src/fem/components/mass.cpp
-  src/fem/components/load.cpp
-  src/fem/components/matrix_component.cpp
-  src/fem/components/stiffness.cpp
-  src/fem/mesh/mesh.cpp
-  src/fem/mesh/island_mesh.cpp
-  src/solvers/laplace_solver.cpp
-  src/solvers/poisson_solver.cpp
+  #src/fe/components/mass.cpp TODO
+  #src/fe/components/load.cpp TODO
+  src/fe/components/stiffness.cpp
+  src/integration/interpolation.cpp
+  src/fe/mesh/abstract_mesh.cpp
+  src/fe/mesh/mesh.cpp
+  src/fe/mesh/island_mesh.cpp
+  #src/solvers/laplace_solver.cpp TODO
+  #src/solvers/poisson_solver.cpp TODO
 )
 
 # copy mesh tester into build directory

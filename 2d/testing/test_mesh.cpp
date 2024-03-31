@@ -7,6 +7,8 @@
 #include <fstream>
 #include <string>
 
+#include "debug.hpp"
+
 using namespace qsim2d;
 
 void output_mesh(const Mesh&, const std::string&);
@@ -63,12 +65,18 @@ int main() {
 
   // output simple mesh
   output_mesh(simple_mesh, "simple");
+
+  // compute metrics and check
+  simple_mesh.compute_metrics();
   
   // construct island mesh
   IslandMesh island_mesh(vertices, triangles);
 
   // output other mesh
   output_mesh(island_mesh.get_internal_mesh(), "internal");
+  
+  // compute metrics
+  island_mesh.compute_metrics();
 }
 
 

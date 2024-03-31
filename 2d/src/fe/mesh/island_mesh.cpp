@@ -102,7 +102,7 @@ IslandMesh::IslandMesh(const std::vector<vertex_t>& vertices, const std::vector<
   std::vector<triangle_t> internal_triangles;
   
   // store pivoting information
-  std::vector<int> vertex_pivot(Nv, 0);
+  std::vector<int> vertex_pivot(Nv, -1);
 
   // re-order vertices
   for (index_t i = 0; i < Nv; ++i) {
@@ -128,7 +128,7 @@ IslandMesh::IslandMesh(const std::vector<vertex_t>& vertices, const std::vector<
       internal_vertices.push_back(vertices[i]);
     }
 
-    npdebug("Vertex ", i, " remapped to ", vertex_pivot[i], ". Internal: ", is_internal[i])
+    //npdebug("Vertex ", i, " remapped to ", vertex_pivot[i], ". Internal: ", is_internal[i])
   }
   
   /*
@@ -157,23 +157,26 @@ IslandMesh::IslandMesh(const std::vector<vertex_t>& vertices, const std::vector<
     triangle_t remapped_triangle;
 
     for (index_t j = 0; j < 3; ++j) { 
-      // if on boundary, shift after the end
-      index_t shift = (internal) ? 0 : Nvi;
+
+      // if on boundary (vertexes), shift after the end
+      index_t shift = (is_internal[triangles[k][j]]) ? 0 : Nvi;
 
       // remap
       remapped_triangle[j] = vertex_pivot[triangles[k][j]] + shift;
     }
-
-    npdebug("Triangle ", 
+    
+    // debug info
+    /*npdebug("Triangle ", 
         triangles[k][0], " ", triangles[k][1], " ", triangles[k][2], " remapped to ", 
         remapped_triangle[0], " ", remapped_triangle[1], " ", remapped_triangle[2], ", Internal: ", internal
-        )
+        )*/
 
     // if it's the case, mark triangle as internal
-    if (internal)
+    if (internal) {
       internal_triangles.push_back(remapped_triangle);
-    else
+    } else {
       boundary_triangles.push_back(remapped_triangle);
+    }
   }
 
   // finally construct internal mesh
@@ -230,6 +233,10 @@ const std::vector<triangle_t>& IslandMesh::get_boundary_triangles() const {
 
 index_t IslandMesh::n_vertices() const {
   return boundary_vertices.size() + internal_mesh->n_vertices();
+}
+
+index_t IslandMesh::n_active_vertices() const {
+  return internal_mesh->n_vertices();
 }
 
 index_t IslandMesh::n_triangles() const {

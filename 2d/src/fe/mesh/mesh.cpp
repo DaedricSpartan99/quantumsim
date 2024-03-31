@@ -53,6 +53,11 @@ index_t Mesh::n_vertices() const {
   return vertices.size();
 }
 
+index_t Mesh::n_active_vertices() const {
+  return vertices.size();
+}
+
+
 index_t Mesh::n_triangles() const {
   return triangles.size();
 }

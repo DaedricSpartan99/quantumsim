@@ -53,7 +53,7 @@ void MatrixComponent::update_mesh_and_field(const Mesh& mesh, const ScalarField&
   N_triangles = mesh.n_triangles();
 
   // update metrics
-  for(index_t k = 0; k < N_triangles; ++k) {
+  /*for(index_t k = 0; k < N_triangles; ++k) {
 
     npdebug("Computing metrics of triangle: ", k)
   
@@ -88,7 +88,7 @@ void MatrixComponent::update_mesh_and_field(const Mesh& mesh, const ScalarField&
     contributions[k].vert_indexes = K;
 
     npdebug("Volume: ", abs(detB))
-  }
+  }*/
 
   // compute evaluations
   update_field(field); 

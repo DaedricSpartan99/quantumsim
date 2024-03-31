@@ -7,10 +7,10 @@
 
 using namespace qsim2d;
 
-Eigen::MatrixXcd fd_stiffness(size_t N);
-double is_symmetric(const Eigen::MatrixXcd& A);
+matrix norm_fd_stiffness(size_t N);
+double is_symmetric(const matrix& A);
 
-void output_vector(const Eigen::VectorXcd& diff, const Eigen::VectorXcd& v);
+void output_vector(const vector& diff, const vector& v);
 
 int main() {
   
@@ -19,7 +19,7 @@ int main() {
    */
   
   // square division per side
-  const int N = 2;
+  const int N = 4;
   const double h = 1. / N;
 
   // initialize components
@@ -57,27 +57,34 @@ int main() {
     }
   }
 
+  //npdebug("Number of vertices: ", vertices.size())
+  //npdebug("Number of triangles: ", triangles.size())
+
   /*
    *  Perform finite difference equality test
    */
 
   // construct simple mesh
-  Mesh mesh (vertices, triangles);
+  std::shared_ptr<IslandMesh> mesh = std::make_shared<IslandMesh>(vertices, triangles);
 
   // Build stiffness matrix and compute difference
-  StiffnessComponent comp(unit_function, mesh);
+  DirichletStiffness comp(mesh);
 
-  Eigen::MatrixXcd A_fe = comp.generate_matrix();
-  Eigen::MatrixXcd A_fd = fd_stiffness(N);
+  matrix A_fe = comp.generate_matrix();
 
-  Eigen::MatrixXcd A_diff = A_fe - A_fd;
+  matrix A_fd = norm_fd_stiffness(N-2);    // -2: exclude boundary
+
+  matrix A_diff = A_fe - A_fd;
 
   /*
    * Output difference properties
    */
 
+  // Size check
+  std::cout << "FE Size: " << A_fe.col(0).size() << ", FD Size: " << A_fd.col(0).size() << std::endl;
+
   // Is-symmetric
-  std::cout << "Is A symmetric: " << is_symmetric(A_fe) << std::endl;
+  std::cout << "Is A symmetric: " << (is_symmetric(A_fe) < 1e-15) << std::endl;
 
   // norm
   std::cout << "Norm of difference: " << A_diff.norm() << std::endl;
@@ -102,9 +109,9 @@ int main() {
   // other parts (spoiler: should be zero)
 }
 
-void output_vector(const Eigen::VectorXcd& w, const Eigen::VectorXcd& v) {
+void output_vector(const vector& w, const vector& v) {
 
-  Eigen::VectorXcd diff(v - w);
+  vector diff(v - w);
 
   std::cout << "Difference norm: " << diff.norm() << std::endl;
   std::cout << "First three values ... end: " << 
@@ -123,34 +130,34 @@ void output_vector(const Eigen::VectorXcd& w, const Eigen::VectorXcd& v) {
   }
 }
 
-double is_symmetric(const Eigen::MatrixXcd& A) {
+double is_symmetric(const matrix& A) {
   return (A - A.transpose()).norm();
 }
 
-Eigen::MatrixXcd fd_stiffness(size_t N) {
+matrix norm_fd_stiffness(size_t N) {
   
   const size_t size = (N+1) * (N+1);
-  Eigen::MatrixXcd A = Eigen::MatrixXcd::Zero(size, size);
+  matrix A = matrix::Zero(size, size);
 
   for (int i = 0; i < N+1; ++i) {
     for (int j = 0; j < N+1; ++j) {
 
       // diagonal
-      A(i*N+j,i*N+j) = 4.;
+      A(i*(N+1)+j,i*(N+1)+j) = 4.;
 
       // subdiagonal
       if (j < N)
-        A(i*N+j,i*N+j+1) = -1.;
+        A(i*(N+1)+j,i*(N+1)+j+1) = -1.;
 
       if (j > 0)
-        A(i*N+j,i*N+j-1) = -1.;
+        A(i*(N+1)+j,i*(N+1)+j-1) = -1.;
 
       // sub-block diagonal
       if (i < N)
-        A(i*N+j,(i+1)*N+j) = -1.;
+        A(i*(N+1)+j,(i+1)*(N+1)+j) = -1.;
 
       if (i > 0)
-        A(i*N+j,(i-1)*N+j) = -1.;
+        A(i*(N+1)+j,(i-1)*(N+1)+j) = -1.;
     }
   }
 
