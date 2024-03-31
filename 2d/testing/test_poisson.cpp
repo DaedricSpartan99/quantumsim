@@ -6,6 +6,8 @@
 #include <matplot/matplot.h>
 #include <functional>
 #include "solvers/poisson_solver.hpp"
+#include <fstream>
+#include "debug.hpp"
 
 template<class T>
 T exact(T x, T y) {
@@ -19,6 +21,9 @@ T rhs(T x, T y) {
 
 using namespace qsim2d;
 
+void output_results(const cpx_vector& solution, const cpx_vector& exact);
+
+
 int main() {
   
   /*
@@ -26,7 +31,8 @@ int main() {
    */
   
   // square division per side
-  const int N = 20;
+  const int N = 10;
+  const double h = 1. / N;
 
   // initialize components
   std::vector<vertex_t> vertices;
@@ -34,14 +40,14 @@ int main() {
 
   // draw first line of vertices 
   for (index_t j = 0; j < N+1; ++j)
-    vertices.push_back(vertex_t{0., double(j) / N});
+    vertices.push_back(vertex_t{0., double(j) * h});
   
   // draw other vertices and bind triangles
   for (index_t i = 1; i < N+1; ++i) {
 
     // draw line of vertices 
     for (index_t j = 0; j < N+1; ++j)
-      vertices.push_back(vertex_t{double(i) / N, double(j) / N});
+      vertices.push_back(vertex_t{double(i) * h, double(j) * h});
     
     // construct two triangles per square (reference corner: bottom left)
     for (index_t j = 0; j < N; ++j) {
@@ -74,10 +80,37 @@ int main() {
       });
 
   // Build poisson solver
+  npdebug("Is unit bound: ", static_cast<bool>(unit_function))
+  npdebug("Is rhs bound: ", static_cast<bool>(rhs_field))
   PoissonSolver solver(island_mesh, unit_function, rhs_field);
   
   // solve system
-  cpx_vector solution = solver.solve();
+  cpx_vector U = solver.solve();
+
+  // compute exact solution for each vertex
+  cpx_vector U_exact(U.size());
+  const auto& internal_vert = island_mesh->get_internal_mesh().all_vertices();
+
+  for (index_t i = 0; i < internal_vert.size(); ++i) {
+    U_exact[i] = (complex) exact(vertices[i][0], vertices[i][1]);
+  }
+
+  // output to file
+  output_results(U, U_exact);
 }
 
 
+void output_results(const cpx_vector& solution, const cpx_vector& exact) {
+  
+  cpx_vector sq_norm_diff = (solution - exact).cwiseAbs2();
+
+  std::ofstream output("poisson.dat");
+
+  output << std::setprecision(15);
+
+  for (index_t i = 0; i < solution.size(); ++i) {
+    output << solution[i].real() << " " << solution[i].imag() << " " << exact[i].real() << " " << exact[i].imag() << " " << sq_norm_diff[i].real() << std::endl;
+  }
+
+  output.close();
+}

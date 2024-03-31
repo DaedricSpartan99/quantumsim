@@ -25,6 +25,8 @@ namespace qsim2d {
   /*
    * Constexpr presets
    */  
-  const ScalarField unit_function;
+  inline const ScalarField unit_function = [](vertex_t) -> complex {
+    return complex(1., 0);
+  };
 }
 

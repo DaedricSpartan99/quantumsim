@@ -1,5 +1,7 @@
 #include "stiffness.hpp"
 
+#include "debug.hpp"
+
 using namespace qsim2d;
 
 const Eigen::Matrix<double, 2, 3> StiffnessComponent::gradients
@@ -15,8 +17,8 @@ cpx_matrix StiffnessComponent::generate_matrix() const {
 
   for (index_t k = 0; k < N_triangles; ++k) {
     
-    for(index_t i = 0; i < interp.size(); ++i) {
-      for(index_t j = 0; j < interp.size(); ++j) {
+    for(index_t i = 0; i < 3; ++i) {
+      for(index_t j = 0; j < 3; ++j) {
       
         // determine vertex indexes
         const index_t N_i = contributions[k].vert_indexes[i];
@@ -34,6 +36,9 @@ cpx_matrix StiffnessComponent::generate_matrix() const {
         for (index_t l = 0; l < interp.size(); ++l) {
           integral += contributions[k].field_evals[l];
         }
+
+        npdebug("Integral stiffness: ", integral.real())
+        npdebug("Metric stiffness: ", metric)
 
         // update matrix
         A(N_i, N_j) += metric * integral;

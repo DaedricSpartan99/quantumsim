@@ -35,5 +35,8 @@ namespace qsim2d {
       
       // store mesh 
       std::weak_ptr<IslandMesh> mesh;
+
+      // store result
+      cpx_vector solution;
   };
 } 

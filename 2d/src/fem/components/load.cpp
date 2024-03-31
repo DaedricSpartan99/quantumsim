@@ -1,5 +1,7 @@
 #include "load.hpp"
 
+#include "debug.hpp"
+
 using namespace qsim2d;
 
 std::array<std::function<double(const vertex_t&)>, 3> LoadComponent::basis = {
@@ -15,7 +17,7 @@ cpx_matrix LoadComponent::generate_matrix() const {
 
   for (index_t k = 0; k < N_triangles; ++k) {
     
-    for(index_t i = 0; i < interp.size(); ++i) {
+    for(index_t i = 0; i < 3; ++i) {
       
         // determine vertex indexes
         const index_t N_i = contributions[k].vert_indexes[i];
@@ -34,6 +36,8 @@ cpx_matrix LoadComponent::generate_matrix() const {
           // phi_i * det(B_k)
           integral += phi_il * contributions[k].field_evals[l];
         }
+
+        npdebug("Integral field phi_", i, ": ", integral)
 
         // update matrix
         M(N_i, 0) += metric * integral;

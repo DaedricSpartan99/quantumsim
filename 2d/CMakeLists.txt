@@ -29,18 +29,19 @@ target_link_libraries(test_mesh quantumsim2d)
 add_test(NAME test_mesh
          COMMAND test_mesh)
 
-# poisson dirichlet zero solver test
-add_executable(test_poisson testing/test_poisson.cpp)
-target_link_libraries(test_poisson quantumsim2d)
-add_test(NAME test_poisson
-         COMMAND test_poisson)
-
-
 # stiffness matrix construction test
-#add_executable(test_stiffness testing/test_stiffness.cpp)
-#target_link_libraries(test_stiffness quantumsim2d)
-#add_test(NAME test_stiffness
-#         COMMAND test_stiffness)
+add_executable(test_stiffness testing/test_stiffness.cpp)
+target_link_libraries(test_stiffness quantumsim2d)
+add_test(NAME test_stiffness
+         COMMAND test_stiffness)
+
+
+# poisson dirichlet zero solver test
+#add_executable(test_poisson testing/test_poisson.cpp)
+#target_link_libraries(test_poisson quantumsim2d)
+#add_test(NAME test_poisson
+#         COMMAND test_poisson)
+
 
 # mass matrix construction test
 #add_executable(test_mass testing/test_mass.cpp)
