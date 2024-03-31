@@ -18,25 +18,25 @@ namespace qsim2d {
    *  u(x) = 0 : x on boundary
    */
 
-  class PoissonSolver : public AbstractSolver {
+  class PoissonSolver {
     public:
 
       PoissonSolver(std::weak_ptr<IslandMesh> mesh, const ScalarField& rho, const ScalarField& f);
 
-      virtual cpx_vector solve() override;
+      vector solve();
 
     private:
 
-      // store scalarfield rho: stiffness
-      StiffnessComponent stiffness;
-
-      // store scalarfield f: load
-      LoadComponent load;
-      
       // store mesh 
       std::weak_ptr<IslandMesh> mesh;
 
+      // store scalarfield rho: stiffness
+      Stiffness stiffness;
+
+      // store scalarfield f: load
+      Load load;
+
       // store result
-      cpx_vector solution;
+      vector solution;
   };
 } 

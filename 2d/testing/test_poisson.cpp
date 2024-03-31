@@ -21,7 +21,7 @@ T rhs(T x, T y) {
 
 using namespace qsim2d;
 
-void output_results(const cpx_vector& solution, const cpx_vector& exact);
+void output_results(const vector& solution, const vector& exact);
 
 
 int main() {
@@ -75,24 +75,24 @@ int main() {
   std::shared_ptr<IslandMesh> island_mesh = std::make_shared<IslandMesh>(vertices, triangles);
 
   // construct field
-  ScalarField rhs_field([&](vertex_t v) -> complex {
-        return (complex) rhs(v[0], v[1]);
+  ScalarField rhs_field([&](vertex_t v) -> double {
+        return rhs(v[0], v[1]);
       });
 
   // Build poisson solver
-  npdebug("Is unit bound: ", static_cast<bool>(unit_function))
+  npdebug("Is unit bound: ", static_cast<bool>(unit_function<double>))
   npdebug("Is rhs bound: ", static_cast<bool>(rhs_field))
-  PoissonSolver solver(island_mesh, unit_function, rhs_field);
+  PoissonSolver solver(island_mesh, unit_function<double>, rhs_field);
   
   // solve system
-  cpx_vector U = solver.solve();
+  vector U = solver.solve();
 
   // compute exact solution for each vertex
-  cpx_vector U_exact(U.size());
+  vector U_exact(U.size());
   const auto& internal_vert = island_mesh->get_internal_mesh().all_vertices();
 
   for (index_t i = 0; i < internal_vert.size(); ++i) {
-    U_exact[i] = (complex) exact(vertices[i][0], vertices[i][1]);
+    U_exact[i] = exact<double>(vertices[i][0], vertices[i][1]);
   }
 
   // output to file
@@ -100,16 +100,16 @@ int main() {
 }
 
 
-void output_results(const cpx_vector& solution, const cpx_vector& exact) {
+void output_results(const vector& solution, const vector& exact) {
   
-  cpx_vector sq_norm_diff = (solution - exact).cwiseAbs2();
+  vector sq_norm_diff = (solution - exact).cwiseAbs2();
 
   std::ofstream output("poisson.dat");
 
   output << std::setprecision(15);
 
   for (index_t i = 0; i < solution.size(); ++i) {
-    output << solution[i].real() << " " << solution[i].imag() << " " << exact[i].real() << " " << exact[i].imag() << " " << sq_norm_diff[i].real() << std::endl;
+    output << solution[i] << " " << exact[i] << " " << sq_norm_diff[i] << std::endl;
   }
 
   output.close();

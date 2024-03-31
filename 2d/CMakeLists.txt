@@ -10,14 +10,14 @@ set(CMAKE_CXX_STANDARD_REQUIRED ON)
 include_directories(src src/fe src/fe/components src/fe/mesh src/integration src/solvers)
 add_library(quantumsim2d STATIC 
   #src/fe/components/mass.cpp TODO
-  #src/fe/components/load.cpp TODO
+  src/fe/components/load.cpp
   src/fe/components/stiffness.cpp
   src/integration/interpolation.cpp
   src/fe/mesh/abstract_mesh.cpp
   src/fe/mesh/mesh.cpp
   src/fe/mesh/island_mesh.cpp
   #src/solvers/laplace_solver.cpp TODO
-  #src/solvers/poisson_solver.cpp TODO
+  src/solvers/poisson_solver.cpp 
 )
 
 # copy mesh tester into build directory
@@ -37,10 +37,10 @@ add_test(NAME test_stiffness
 
 
 # poisson dirichlet zero solver test
-#add_executable(test_poisson testing/test_poisson.cpp)
-#target_link_libraries(test_poisson quantumsim2d)
-#add_test(NAME test_poisson
-#         COMMAND test_poisson)
+add_executable(test_poisson testing/test_poisson.cpp)
+target_link_libraries(test_poisson quantumsim2d)
+add_test(NAME test_poisson
+         COMMAND test_poisson)
 
 
 # mass matrix construction test

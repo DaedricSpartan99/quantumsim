@@ -13,8 +13,8 @@ namespace qsim2d {
        *
        * With the logic:
        *
-       *  int{f(T(z))}
+       *  int{f(z)}
        */
-      virtual double integrate(const ScalarField& f, transform_t T) const = 0;
+      virtual double integrate(const ScalarField& f) const = 0;
   };
 } 

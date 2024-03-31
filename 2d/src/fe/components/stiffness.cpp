@@ -42,7 +42,9 @@ matrix Stiffness::generate_matrix() const {
     const auto& metric = metrics[k];
 
     // integrate field
-    double field_integral = integrator->integrate(field, metric.transform); 
+    double field_integral = integrator->integrate([&](vertex_t z) {
+          return field(metric.transform(z));
+        }); 
 
     //npdebug("Volume: ", metric.abs_detB)
     //npdebug("Field integral: ", field_integral)

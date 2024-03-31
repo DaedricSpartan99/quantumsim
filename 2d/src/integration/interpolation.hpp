@@ -22,7 +22,7 @@ namespace qsim2d {
 
       Interpolator(const std::vector<InterpPair>& pairs);
 
-      virtual double integrate(const ScalarField& f, transform_t T) const override;
+      virtual double integrate(const ScalarField& f) const override;
 
     private:
 
