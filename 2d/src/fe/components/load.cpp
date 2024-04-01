@@ -42,7 +42,7 @@ vector Load::generate_vector() const {
 
     for(index_t i = 0; i < 3; ++i) {
 
-        // integrate field over basis i
+        // integrate field * basis_i over unit triangle
         double field_integral = integrator->integrate([&](vertex_t z) -> double {
           return field(metric.transform(z)) * basis[i](z);
         }); 
@@ -70,4 +70,19 @@ vector Load::generate_vector() const {
   
   return l;
 }
+
+
+DirichletLoad::DirichletLoad(std::weak_ptr<const IslandMesh> mesh, 
+          const ScalarField& field,
+          std::shared_ptr<const Integrator> integrator)
+  : Load(std::static_pointer_cast<const AbstractMesh>(mesh.lock()), field, integrator) {
+  }
+
+
+NeumannLoad::NeumannLoad(std::weak_ptr<const Mesh> mesh, 
+          const ScalarField& field,
+          std::shared_ptr<const Integrator> integrator)
+  : Load(std::static_pointer_cast<const AbstractMesh>(mesh.lock()), field, integrator) {
+  }
+
 

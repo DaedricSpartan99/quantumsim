@@ -1,6 +1,7 @@
 #include "types.hpp"
 #include "mesh.hpp"
 #include "stiffness.hpp"
+#include "load.hpp"
 #include <iostream>
 #include <vector>
 #include "debug.hpp"
@@ -8,7 +9,43 @@
 using namespace qsim2d;
 
 matrix norm_fd_stiffness(size_t N);
+vector fd_load(const std::vector<vertex_t>& vertices, std::function<double(vertex_t)> rhs);
 double is_symmetric(const matrix& A);
+
+template<class T>
+T rhs_first_deg(T x, T y) {
+  return x + y + 3; 
+}
+
+template<class T>
+T rhs_second_deg(T x, T y) {
+  return x * x + y * y;
+}
+
+std::vector<InterpPair> GAUSS_FOUR_POINTS = {
+        InterpPair{0.068464377, {0.112701665, 0.100000000}},
+        InterpPair{0.109543004, {0.112701665, 0.443649167}},
+        InterpPair{0.068464377, {0.112701665, 0.787298334}},
+        InterpPair{0.061728395, {0.500000000, 0.056350832}},
+        InterpPair{0.098765432, {0.500000000, 0.250000000}},
+        InterpPair{0.061728395, {0.500000000, 0.443649167}},
+        InterpPair{0.008696116, {0.887298334, 0.012701665}},
+        InterpPair{0.013913785, {0.887298334, 0.056350832}},
+        InterpPair{0.008696116, {0.887298334, 0.100000000}}
+};
+
+std::vector<InterpPair> GAUSS_MANY_POINTS = {
+  InterpPair{0.6846439e-01, {0.1063508e+00, 0.1063508e+00}},
+  InterpPair{0.8563571e-01, {0.4718246e+00, 0.8452624e-01}},
+  InterpPair{0.3858025e-01, {0.8372983e+00, 0.6270166e-01}},
+  InterpPair{0.8563571e-01, {0.8452624e-01, 0.4718246e+00}},
+  InterpPair{0.9876543e-01, {0.3750000e+00, 0.3750000e+00}},
+  InterpPair{0.3782109e-01, {0.6654738e+00, 0.2781754e+00}},
+  InterpPair{0.3858025e-01, {0.6270166e-01, 0.8372983e+00}},
+  InterpPair{0.3782109e-01, {0.2781754e+00, 0.6654738e+00}},
+  InterpPair{0.8696116e-02, {0.4936492e+00, 0.4936492e+00}}
+};
+
 
 void output_vector(const vector& diff, const vector& v);
 
@@ -61,7 +98,7 @@ int main() {
   //npdebug("Number of triangles: ", triangles.size())
 
   /*
-   *  Perform finite difference equality test
+   *  Perform finite difference equality test on stiffness
    */
 
   // construct simple mesh
@@ -79,6 +116,7 @@ int main() {
   /*
    * Output difference properties
    */
+  std::cout << "Stiffness analysis" << std::endl << std::endl;
 
   // Size check
   std::cout << "FE Size: " << A_fe.col(0).size() << ", FD Size: " << A_fd.col(0).size() << std::endl;
@@ -104,9 +142,69 @@ int main() {
   std::cout << "First inferior sub-block-diagonal analysis" << std::endl;
   output_vector(A_fd.diagonal(-(N+1)), A_fe.diagonal(-(N+1)));
   std::cout << std::endl;
+  std::cout << std::endl;
 
+  /*
+   *  Perform finite difference equality test on load
+   */ 
+  std::vector<vertex_t> internal_vert = mesh->get_internal_mesh().all_vertices();
+
+  auto rhs_first = [](vertex_t v) -> double {
+        return rhs_first_deg(v[0], v[1]);
+      };
+
+  DirichletLoad fe_load_comp(mesh, rhs_first);
   
-  // other parts (spoiler: should be zero)
+  // get finite element load
+  vector fe_l = fe_load_comp.generate_vector();
+  
+  // get finite difference load
+  vector fd_l = fd_load(internal_vert, rhs_first) * h * h;
+
+  // output properties
+  std::cout << "Load analysis, rhs first order" << std::endl << std::endl;
+
+  std::cout << "Vector equality test" << std::endl;
+  output_vector(fd_l, fe_l);
+  std::cout << std::endl;
+  
+  auto rhs_second = [](vertex_t v) -> double {
+        return rhs_second_deg(v[0], v[1]);
+      };
+  
+  auto high_order_int = std::make_shared<const Interpolator>(GAUSS_MANY_POINTS);
+  auto original_order_int = std::make_shared<const Interpolator>(GAUSS_TRI_POINTS);
+
+  DirichletLoad fe_load_second_comp(mesh, 
+      rhs_second, high_order_int
+  );
+  
+  // get finite element load
+  vector fe_l_second = fe_load_second_comp.generate_vector();
+  
+  // get finite difference load
+  vector fd_l_second = fd_load(internal_vert, rhs_second) * h * h;
+
+  std::cout << "Load analysis, rhs second order" << std::endl << std::endl;
+
+  std::cout << "Vector equality test" << std::endl;
+  output_vector(fd_l_second, fe_l_second);
+  std::cout << std::endl;
+
+  const double exact_second_order = 1. / 6;
+  const double high_order_test = high_order_int->integrate([](vertex_t) -> double { return 1; });
+  const double numerical_second_order = high_order_int->integrate(rhs_second);
+  const double numerical_second_order_original = original_order_int->integrate(rhs_second);
+
+  std::cout << "Integration test second order" << std::endl;
+  std::cout << "Integration of unit function: " << high_order_test << std::endl;
+  std::cout << "Integral high order numerical value: " <<
+    numerical_second_order << std::endl;
+  std::cout << "Integral exact value: " <<
+    exact_second_order << std::endl;
+  std::cout << "Difference: " << abs(exact_second_order - numerical_second_order) << std::endl;
+  std::cout << "Difference with original interpolation: " << abs(exact_second_order - numerical_second_order_original) << std::endl;
+  std::cout << std::endl;
 }
 
 void output_vector(const vector& w, const vector& v) {
@@ -162,4 +260,16 @@ matrix norm_fd_stiffness(size_t N) {
   }
 
   return A;
+}
+
+
+vector fd_load(const std::vector<vertex_t>& vertices, std::function<double(vertex_t)> rhs) {
+  
+  vector v = vector::Zero(vertices.size());
+
+  for (size_t i = 0; i < vertices.size(); ++i) {
+    v[i] = rhs(vertices[i]);
+  }
+
+  return v;
 }
