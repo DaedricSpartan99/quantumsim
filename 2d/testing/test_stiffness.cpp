@@ -22,6 +22,12 @@ T rhs_second_deg(T x, T y) {
   return x * x + y * y;
 }
 
+
+template<class T>
+T rhs_third_deg(T x, T y) {
+  return x * x * x + y * y * y;
+}
+
 std::vector<InterpPair> GAUSS_FOUR_POINTS = {
         InterpPair{0.068464377, {0.112701665, 0.100000000}},
         InterpPair{0.109543004, {0.112701665, 0.443649167}},
@@ -171,6 +177,10 @@ int main() {
   auto rhs_second = [](vertex_t v) -> double {
         return rhs_second_deg(v[0], v[1]);
       };
+
+  auto rhs_third = [](vertex_t v) -> double {
+        return rhs_third_deg(v[0], v[1]);
+      };
   
   auto high_order_int = std::make_shared<const Interpolator>(GAUSS_MANY_POINTS);
   auto original_order_int = std::make_shared<const Interpolator>(GAUSS_TRI_POINTS);
@@ -191,19 +201,19 @@ int main() {
   output_vector(fd_l_second, fe_l_second);
   std::cout << std::endl;
 
-  const double exact_second_order = 1. / 6;
+  const double exact_third_order = 1. / 10;
   const double high_order_test = high_order_int->integrate([](vertex_t) -> double { return 1; });
-  const double numerical_second_order = high_order_int->integrate(rhs_second);
-  const double numerical_second_order_original = original_order_int->integrate(rhs_second);
+  const double numerical_third_order = high_order_int->integrate(rhs_third);
+  const double numerical_third_order_original = original_order_int->integrate(rhs_third);
 
   std::cout << "Integration test second order" << std::endl;
   std::cout << "Integration of unit function: " << high_order_test << std::endl;
   std::cout << "Integral high order numerical value: " <<
-    numerical_second_order << std::endl;
+    numerical_third_order << std::endl;
   std::cout << "Integral exact value: " <<
-    exact_second_order << std::endl;
-  std::cout << "Difference: " << abs(exact_second_order - numerical_second_order) << std::endl;
-  std::cout << "Difference with original interpolation: " << abs(exact_second_order - numerical_second_order_original) << std::endl;
+    exact_third_order << std::endl;
+  std::cout << "Difference: " << abs(exact_third_order - numerical_third_order) << std::endl;
+  std::cout << "Difference with original interpolation: " << abs(exact_third_order - numerical_third_order_original) << std::endl;
   std::cout << std::endl;
 }
 
@@ -259,7 +269,7 @@ matrix norm_fd_stiffness(size_t N) {
     }
   }
 
-  return A;
+  return -A;
 }
 
 

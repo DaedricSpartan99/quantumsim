@@ -23,6 +23,8 @@ add_library(quantumsim2d STATIC
 # copy mesh tester into build directory
 configure_file(${CMAKE_SOURCE_DIR}/testing/plot_mesh.py ${CMAKE_CURRENT_BINARY_DIR}/plot_mesh.py COPYONLY)
 
+configure_file(${CMAKE_SOURCE_DIR}/testing/plot_poisson.py ${CMAKE_CURRENT_BINARY_DIR}/plot_poisson.py COPYONLY)
+
 # mesh construction test
 add_executable(test_mesh testing/test_mesh.cpp)
 target_link_libraries(test_mesh quantumsim2d)

@@ -98,7 +98,7 @@ matrix Stiffness::generate_matrix() const {
         } 
         
         // assign contribution
-        A(N_i, N_j) += A_k(i,j);
+        A(N_i, N_j) -= A_k(i,j);
       }
     }
     

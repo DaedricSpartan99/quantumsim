@@ -10,19 +10,41 @@
 #include "debug.hpp"
 
 template<class T>
+T g(T x) {
+  return 1. - 4. * (x - 0.5)*(x - 0.5);
+}
+
+template<class T>
 T exact(T x, T y) {
-  return (1. - (x - 0.5)*(x - 0.5) / 4.) * (1. - (y - 0.5)*(y - 0.5) / 4.);
+  return g(x) * g(y);
 }
 
 template<class T>
 T rhs(T x, T y) {
-  return -8. * (2. - 4. * ((x - 0.5) * (x - 0.5) + (y - 0.5)*(y - 0.5)) );
+  return -8. * ( g(x) + g(y) );
 }
 
 using namespace qsim2d;
 
-void output_results(const vector& solution, const vector& exact);
+std::vector<InterpPair> GAUSS_MANY_POINTS = {
+  InterpPair{0.6846439e-01, {0.1063508e+00, 0.1063508e+00}},
+  InterpPair{0.8563571e-01, {0.4718246e+00, 0.8452624e-01}},
+  InterpPair{0.3858025e-01, {0.8372983e+00, 0.6270166e-01}},
+  InterpPair{0.8563571e-01, {0.8452624e-01, 0.4718246e+00}},
+  InterpPair{0.9876543e-01, {0.3750000e+00, 0.3750000e+00}},
+  InterpPair{0.3782109e-01, {0.6654738e+00, 0.2781754e+00}},
+  InterpPair{0.3858025e-01, {0.6270166e-01, 0.8372983e+00}},
+  InterpPair{0.3782109e-01, {0.2781754e+00, 0.6654738e+00}},
+  InterpPair{0.8696116e-02, {0.4936492e+00, 0.4936492e+00}}
+};
 
+
+void output_convergence(const std::vector<std::tuple<int, double, double>>& convergence);
+void output_results(std::shared_ptr<IslandMesh>, const vector& solution, const vector& exact);
+vector analytic_rhs(const std::vector<vertex_t>& vertices, double h);
+
+std::shared_ptr<IslandMesh> generate_mesh(int N);
+vector compute_exact(const std::vector<vertex_t>& vertices);
 
 int main() {
   
@@ -31,7 +53,114 @@ int main() {
    */
   
   // square division per side
-  const int N = 10;
+  const int N = 20;
+  const double h = 1. / N;
+
+    // construct island mesh
+  std::shared_ptr<IslandMesh> island_mesh = generate_mesh(N);
+
+  // construct field
+  ScalarField rhs_field([&](vertex_t v) -> double {
+        return rhs(v[0], v[1]);
+      });
+
+  // a finer integrator
+  auto integrator = std::make_shared<const Interpolator>(GAUSS_MANY_POINTS);
+
+  // Build poisson solver
+  npdebug("Is unit bound: ", static_cast<bool>(unit_function<double>))
+  npdebug("Is rhs bound: ", static_cast<bool>(rhs_field))
+  PoissonSolver solver(island_mesh, unit_function<double>, rhs_field);
+  
+  // solve system
+  vector U = solver.solve();
+
+  // compute exact solution for each vertex
+  const auto& internal_vert = island_mesh->get_internal_mesh().all_vertices();
+
+  vector U_exact = compute_exact(internal_vert);
+
+  // output to file
+  output_results(island_mesh, U, U_exact);
+
+  // print norm distance
+  std::cout << "Norm of difference: " << (U - U_exact).norm() << std::endl;
+
+  // Deepen on rhs
+  std::cout << "Difference of rhs: " << (solver.get_stiffness().generate_matrix() * U_exact - analytic_rhs(internal_vert, h)).norm() << std::endl;
+
+  // Rhs load
+  std::cout << "Load difference on finite difference and finite element: " << (solver.get_load().generate_vector() - analytic_rhs(internal_vert, h)).norm() << std::endl;
+
+  // Print rhs load
+  std::cout << "RHS load, fd" << std::endl;
+  Eigen::MatrixXd D(internal_vert.size(), 2);
+  D << solver.get_load().generate_vector(), analytic_rhs(internal_vert, h);
+  std::cout << D << std::endl;   
+
+  /*
+   * Perform convergence test
+   */
+
+  std::cout << std::endl << "Convergence test" << std::endl << std::endl;
+
+  const int n_begin = 8;
+  const int n_end = 40;
+  
+  std::vector<int> N_iters(n_end - n_begin);
+  std::generate(N_iters.begin(), N_iters.end(), [n = n_begin]() mutable { return n++; });
+
+  std::vector<std::tuple<int, double, double>> convergence;
+  
+  // simulate for each n
+  for (auto n : N_iters) {
+
+    std::cout << std::endl << "n = " << n << std::endl << std::endl;
+    
+    const double h = 1. / n;
+
+    // construct island mesh
+    std::shared_ptr<IslandMesh> island_mesh_n = generate_mesh(n);
+
+    // construct field
+    ScalarField rhs_field_n([&](vertex_t v) -> double {
+      return rhs(v[0], v[1]);
+    });
+
+    // Build poisson solver
+    PoissonSolver solver_n(island_mesh_n, unit_function<double>, rhs_field_n);
+  
+    // solve system
+    vector U_n = solver_n.solve();
+
+    // compute exact solution for each vertex
+    const auto& internal_vert_n = island_mesh_n->get_internal_mesh().all_vertices();
+
+    vector U_exact_n = compute_exact(internal_vert_n);
+
+    convergence.push_back({n, h, (U_n - U_exact_n).norm()});
+  }
+
+  // output result
+  output_convergence(convergence);
+}
+
+
+void output_convergence(const std::vector<std::tuple<int, double, double>>& convergence) {
+  
+  std::ofstream output("poisson_convergence.dat");
+
+  output << std::setprecision(15);
+
+  for (index_t i = 0; i < convergence.size(); ++i) {
+    output << std::get<0>(convergence[i]) << " " << std::get<1>(convergence[i]) << " " << std::get<2>(convergence[i]) << std::endl;
+  }
+
+  output.close();
+}
+
+std::shared_ptr<IslandMesh> generate_mesh(int N) {
+
   const double h = 1. / N;
 
   // initialize components
@@ -69,38 +198,36 @@ int main() {
     }
   }
 
-  using namespace matplot;
-
   // construct island mesh
-  std::shared_ptr<IslandMesh> island_mesh = std::make_shared<IslandMesh>(vertices, triangles);
+  return std::make_shared<IslandMesh>(vertices, triangles);
+}
 
-  // construct field
-  ScalarField rhs_field([&](vertex_t v) -> double {
-        return rhs(v[0], v[1]);
-      });
+vector compute_exact(const std::vector<vertex_t>& internal_vert) {
 
-  // Build poisson solver
-  npdebug("Is unit bound: ", static_cast<bool>(unit_function<double>))
-  npdebug("Is rhs bound: ", static_cast<bool>(rhs_field))
-  PoissonSolver solver(island_mesh, unit_function<double>, rhs_field);
-  
-  // solve system
-  vector U = solver.solve();
-
-  // compute exact solution for each vertex
-  vector U_exact(U.size());
-  const auto& internal_vert = island_mesh->get_internal_mesh().all_vertices();
+  vector U_exact(internal_vert.size());
 
   for (index_t i = 0; i < internal_vert.size(); ++i) {
-    U_exact[i] = exact<double>(vertices[i][0], vertices[i][1]);
+    U_exact[i] = exact<double>(internal_vert[i][0], internal_vert[i][1]);
+  }
+  
+  return U_exact;
+}
+
+vector analytic_rhs(const std::vector<vertex_t>& vertices, double h) {
+
+  vector v = vector::Zero(vertices.size());
+
+  for (int i = 0; i < vertices.size(); ++i) {
+    v[i] = rhs(vertices[i][0], vertices[i][1]) * h * h;
   }
 
-  // output to file
-  output_results(U, U_exact);
+  return v;
 }
 
 
-void output_results(const vector& solution, const vector& exact) {
+void output_results(std::shared_ptr<IslandMesh> mesh, const vector& solution, const vector& exact) {
+
+  const std::vector<vertex_t> vertices = mesh->get_internal_mesh().all_vertices();
   
   vector sq_norm_diff = (solution - exact).cwiseAbs2();
 
@@ -109,7 +236,12 @@ void output_results(const vector& solution, const vector& exact) {
   output << std::setprecision(15);
 
   for (index_t i = 0; i < solution.size(); ++i) {
-    output << solution[i] << " " << exact[i] << " " << sq_norm_diff[i] << std::endl;
+    output << 
+      vertices[i][0] << " " <<
+      vertices[i][1] << " " <<
+      solution[i] << " " << 
+      exact[i] << " " << 
+      sq_norm_diff[i] << std::endl;
   }
 
   output.close();

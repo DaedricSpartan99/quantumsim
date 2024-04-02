@@ -21,9 +21,13 @@ namespace qsim2d {
   class PoissonSolver {
     public:
 
-      PoissonSolver(std::weak_ptr<IslandMesh> mesh, const ScalarField& rho, const ScalarField& f);
+      PoissonSolver(std::weak_ptr<IslandMesh> mesh, const ScalarField& rho, const ScalarField& f, std::shared_ptr<const Integrator> integrator = std::make_shared<const Interpolator>(GAUSS_TRI_POINTS));
 
       vector solve();
+
+      const Stiffness& get_stiffness() const;
+
+      const Load& get_load() const;
 
     private:
 

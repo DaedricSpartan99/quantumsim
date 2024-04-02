@@ -8,12 +8,13 @@ using namespace qsim2d;
 PoissonSolver::PoissonSolver(
     std::weak_ptr<IslandMesh> mesh, 
     const ScalarField& rho,
-    const ScalarField& f
+    const ScalarField& f,
+    std::shared_ptr<const Integrator> integrator
     ) 
   :
     mesh(mesh),
-    stiffness(mesh, rho),
-    load(mesh, f)
+    stiffness(mesh, rho, integrator),
+    load(mesh, f, integrator)
 {
 }
 
@@ -24,14 +25,14 @@ vector PoissonSolver::solve() {
   // determine system of equations
   npdebug("Generating stiffness")
   matrix A = stiffness.generate_matrix();
-  npdebug("Stiffness matrix: ", A.diagonal())
+  //npdebug("Stiffness matrix: ", A.diagonal())
 
   npdebug("Generating load")
   vector l = load.generate_vector();
-  npdebug("Load vector: ", l)
+  //npdebug("Load vector: ", l)
 
   // solve linear system
-  //solution = A.colPivHouseholderQr().solve(L);
+  //solution = A.colPivHouseholderQr().solve(l);
   solution = A.fullPivLu().solve(l);
 
   // verify it's a solution
@@ -40,4 +41,12 @@ vector PoissonSolver::solve() {
   return solution;
 }
 
+
+const Stiffness& PoissonSolver::get_stiffness() const {
+  return stiffness;
+}
+
+const Load& PoissonSolver::get_load() const {
+  return load;
+}
 
