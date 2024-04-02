@@ -9,14 +9,13 @@ set(CMAKE_CXX_STANDARD_REQUIRED ON)
 
 include_directories(src src/fe src/fe/components src/fe/mesh src/integration src/solvers)
 add_library(quantumsim2d STATIC 
-  #src/fe/components/mass.cpp TODO
+  src/fe/components/mass.cpp 
   src/fe/components/load.cpp
   src/fe/components/stiffness.cpp
   src/integration/interpolation.cpp
   src/fe/mesh/abstract_mesh.cpp
   src/fe/mesh/mesh.cpp
   src/fe/mesh/island_mesh.cpp
-  #src/solvers/laplace_solver.cpp TODO
   src/solvers/poisson_solver.cpp 
 )
 
@@ -45,34 +44,23 @@ add_test(NAME test_poisson
          COMMAND test_poisson)
 
 
-# mass matrix construction test
-#add_executable(test_mass testing/test_mass.cpp)
-#target_link_libraries(test_mass quantumsim2d)
-#add_test(NAME test_mass
-#         COMMAND test_mass)
-
-# load vector construction test
-#add_executable(test_load testing/test_load.cpp)
-#target_link_libraries(test_load quantumsim2d)
-#add_test(NAME test_load
-#         COMMAND test_load)
-
-# laplace dirichlet zero solver test
-#add_executable(test_laplace testing/test_laplace.cpp)
-#target_link_libraries(test_laplace quantumsim2d)
-#add_test(NAME test_laplace
-#         COMMAND test_laplace)
-
 # heat dirichlet zero solver test
-#add_executable(test_heat testing/test_heat.cpp)
-#target_link_libraries(test_heat quantumsim2d)
-#add_test(NAME test_heat
-#         COMMAND test_heat)
+#add_executable(test_light testing/test_light.cpp)
+#target_link_libraries(test_light quantumsim2d)
+#add_test(NAME test_light
+#         COMMAND test_light)
 
 # schrodinger dirichlet zero solver test
 #add_executable(test_schrodinger testing/test_schrodinger.cpp)
 #target_link_libraries(test_schrodinger quantumsim2d)
 #add_test(NAME test_schrodinger
 #         COMMAND test_schrodinger)
+
+
+# schrodinger dirichlet zero solver test
+#add_executable(test_double_fent testing/test_double_fent.cpp)
+#target_link_libraries(test_double_fent quantumsim2d)
+#add_test(NAME test_double_fent
+#         COMMAND test_double_fent)
 
 
