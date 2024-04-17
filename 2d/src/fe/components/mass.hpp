@@ -1,7 +1,13 @@
 #pragma once
 
-#include <functional>
 #include "matrix_component.hpp"
+#include "interpolation.hpp"
+#include "fe_component.hpp"
+#include "island_mesh.hpp"
+#include "mesh.hpp"
+#include <memory>
+
+
 
 namespace qsim2d {
 

@@ -2,7 +2,7 @@
 
 using namespace qsim2d;
 
-std::array<std::function<double(const vertex_t&)>, 3> MassComponent::basis = {
+std::array<std::function<double(const vertex_t&)>, 3> Mass::basis = {
         [](const vertex_t& z) -> double { return 1 - z[0] - z[1]; }, 
         [](const vertex_t& z) -> double { return z[0]; },
         [](const vertex_t& z) -> double { return z[1]; }
@@ -85,7 +85,7 @@ matrix Mass::generate_matrix() const {
 
   } 
   
-  return l;
+  return M;
 }
 
 
@@ -102,7 +102,7 @@ DirichletMass::DirichletMass(
           std::weak_ptr<const IslandMesh> mesh, 
           const ScalarField& field,
           std::shared_ptr<const Integrator> integrator) 
-  : Masss(std::static_pointer_cast<const AbstractMesh>(mesh.lock()), field, integrator)
+  : Mass(std::static_pointer_cast<const AbstractMesh>(mesh.lock()), field, integrator)
 {
 }
 

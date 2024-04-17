@@ -17,6 +17,7 @@ add_library(quantumsim2d STATIC
   src/fe/mesh/mesh.cpp
   src/fe/mesh/island_mesh.cpp
   src/solvers/poisson_solver.cpp 
+  src/solvers/bounded_particle.cpp
 )
 
 # copy mesh tester into build directory
@@ -42,6 +43,13 @@ add_executable(test_poisson testing/test_poisson.cpp)
 target_link_libraries(test_poisson quantumsim2d)
 add_test(NAME test_poisson
          COMMAND test_poisson)
+
+
+# schrodinger dirichlet zero solver test
+add_executable(test_bounded testing/test_bounded.cpp)
+target_link_libraries(test_bounded quantumsim2d)
+add_test(NAME test_bounded
+         COMMAND test_bounded)
 
 
 # heat dirichlet zero solver test
