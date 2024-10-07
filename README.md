@@ -6,7 +6,8 @@ Instead of targetting the most accurate description of reality, it targets the p
 Thus, the default numerical time evolvers are lightweight and stable in all configurations, but one can chose to use its own evolver if it requires more precision.
 
 The purpose is to numerically solve the Schrödinger's equation:
-$$ \hat{\mathcal{H}} \psi = i \hbar \frac{\partial \psi}{\partial t} $$
+
+$$\hat{\mathcal{H}} \psi = i \hbar \frac{\partial \psi}{\partial t}$$
 
 The user sets the geometry of the system, included parameters and boundaries, and the potential at each timestep.
 Than the simulation starts or can be sinchronized to an external clock, like an animation fps.
